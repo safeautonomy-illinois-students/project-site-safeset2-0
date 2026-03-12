@@ -67,18 +67,17 @@ University of Illinois at Urbana-Champaign,  ECE 484
 ## Abstract {.section-title}
 
 ::: {.abstract-text}
-This project develops an autonomous flight stack for the **CrazyFlie 2.1** nano quadrotor targeting
-gate-traversal drone racing, using a Software-in-the-Loop (SITL) simulation environment.
-We build on **CrazySim** — a Gazebo Garden-based simulator that runs the real CrazyFlie firmware
-in simulation — combined with **Crazyswarm2** as the ROS 2 interface layer, enabling direct
-portability between simulation and hardware.
+We want to build controllers that enable a quadrotor to reliably navigate through a sequence of racing gates within the photorealistic FalconGym simulation environment.
+We build an autonomous flight stack for the **CrazyFlie 2.1** that races through gates entirely in
+simulation. The platform is **CrazySim** + **Gazebo Garden** + **ROS2**, running the actual CrazyFlie
+firmware — so anything we prove in sim can transfer to real hardware. Three tracks are available:
+**Circle**, **U-turn**, and **Lemniscate**, each with physical gate obstacles.
 
-The simulator provides three racing tracks (**Circle**, **Lemniscate/figure-8**, and **U-Turn**),
-each populated with physical drone gates. Our current baseline is a waypoint-following controller
-that navigates the drone through pre-defined gate coordinates. Going forward, we plan to develop
-a more capable controller — incorporating pose feedback and [planned approach, e.g., model predictive
-control / vision-based gate detection] — to achieve faster and more robust autonomous gate traversal.
-All development is done in ROS 2 Humble on Ubuntu 22.04.
+Current baseline is a stop-and-go waypoint follower (`waypoint_follower.py`) that calls `GoTo` with
+pre-known gate coordinates. Our goal is to replace it with a **minimum-snap trajectory tracker** —
+pre-compute a smooth polynomial path through all gates, then track it live with a PD full-state
+controller publishing `cmd_full_state`. This eliminates the stop-at-every-waypoint behavior and
+produces fast, physically smooth flight without any vision.
 :::
 
 :::
@@ -210,8 +209,10 @@ We would want to have this project working just like MP2, but in SO(3). Test and
 
 ::: {.video-container}
 <!-- Replace with your local video embed -->
-{{< video static/videos/pitch_presentation_simulation_working.mp4 >}}
+<!-- {{< video static/videos/pitch_presentation_simulation_working.mp4 >}} -->
+![Flowchat](static/images/system_architecture.svg){width=80% fig-align="center"}
 :::
+
 
 :::
 
