@@ -95,8 +95,7 @@ All development is done in ROS 2 Humble on Ubuntu 22.04.
 ::: {.content-text}
 
 ### Problem Statement
-Given a pre-defined racing track with physical gates, command a CrazyFlie 2.1 to autonomously
-take off, fly through every gate in order, and land — with no human intervention.
+Given a pre-defined racing track with physical gates and a knowledge of waypoints that could lead the drone to cross the the gates and the knowledge of the world coordnate of the drone itself through motion capture, command a CrazyFlie 2.1 to autonomously take off, fly through every gate in order, and land — with no human intervention.
 
 ### Simulation Environment
 We use **CrazySim** (ICRA 2024) as our SITL platform. It compiles the real CrazyFlie firmware
@@ -127,6 +126,43 @@ INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE
 At each step the node calls the Crazyswarm2 `GoTo` service, which handles low-level
 position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware.
 Waypoint arrival is detected when the XY distance to the target drops below 0.3 m.
+          +-----------------------------+
+          |      Waypoints / Trajectory |
+          +-----------------------------+
+                        │
+                        ▼
+          +-----------------------------+
+          | Outer-loop Controller       |
+          | (PID or MPC)                |
+          | Computes:                   |
+          | φ_comm, θ_comm, ψ_comm, u_T |
+          +-----------------------------+
+                        │
+                        ▼
+          +-----------------------------+
+          | Inner-loop PID (Firmware)   |
+          | Stabilizes angles and thrust|
+          | Outputs motor commands      |
+          +-----------------------------+
+                        │
+                        ▼
+                  +-----------+
+                  |   Motors  |
+                  +-----------+
+                        │
+                        ▼
+                  +-----------+
+                  |   Drone   |
+                  |  Motion   |
+                  +-----------+
+                        │
+                        ▼
+          +-----------------------------+
+          |  Sensors & State Estimation |
+          | (IMU, Motion Capture, Flow) |
+          +-----------------------------+
+                        │
+                        └─────────────► Feedback to Outer-loop Controller
 
 ### Block Diagram
 
@@ -134,23 +170,28 @@ Waypoint arrival is detected when the XY distance to the target drops below 0.3 
 ┌─────────────────────────────────────────────────────────────────┐
 │                        ROS 2 Node                               │
 │  ┌──────────────┐    GoTo/Takeoff/Land     ┌─────────────────┐  │
-│  │  Waypoint    │ ────────────────────────▶│  Crazyswarm2    │  │
+│  │  Waypoint    │ ───────────────────────▶│  Crazyswarm2    │  │
 │  │  Controller  │                          │  (cflib backend)│  │
-│  │              │◀─────────────────────────│                 │  │
+│  │              │◀────────────────────────│                 │  │
 │  └──────────────┘    /cf_1/pose            └────────┬────────┘  │
 └───────────────────────────────────────────────────┼─────────────┘
                                                     │ UDP (19850)
                                          ┌──────────▼──────────────┐
-                                         │   CrazySim SITL          │
-                                         │  (CrazyFlie firmware     │
-                                         │   + Gazebo Garden)       │
+                                         │   CrazySim SITL         │
+                                         │  (CrazyFlie firmware    │
+                                         │   + Gazebo Garden)      │
                                          └─────────────────────────┘
 ```
 
 ### Planned Extensions
-- [Describe your next controller idea here, e.g., MPC, velocity control, vision-based detection]
-- Tuning waypoint sequences for the Lemniscate and U-Turn tracks
-- Measuring lap time and gate-miss rate as quantitative metrics
+- Quantization of robustness and stability analysis through measuring lap time and gate-miss rate as quantitative metrics
+- Set waypoints for the other two tracks, U-Turn and Lemniscate tracks.
+- Implement a controller beyond the one beyond firmware burnt-in one. Create fine-grained controller aside from just going to the next waypoint in a rough and sparse set of waypoints with constant speed. 
+We would want to have this project working just like MP2, but in SO(3). Test and compare between different longitudial and lateral controlling methods and compare the achievalbe speed of each of them through profilling the drone's internal sensors across all three tracks.
+- Advanced non-linear longitudial control of speed concerning SO(3) parameters
+- Advanced lateral control concerning rotation with repsect to all three rotation matrices.
+- Advanced part by part trojectory fitting by modeling the physically optimal trajectories that the drone could fly in highest speed and try to fit these partterns into the real world waypoints to achieve this speed
+- If camera available: CV based pixel to world coordinates regression and then get rid of the knowledge of the knowledge on the current world coordinates of the drone(I.e., get rid of the motion capture system), but since we do not have access to any cameras, this is just a proposal
 
 :::
 

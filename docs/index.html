@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ECE 484 Final Project Site – Project Title</title>
+<title>Autonomous CrazyFlie Drone Racing – Project Title</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -164,18 +164,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="section" class="level1 title hero-section">
-<h1 class="title"></h1>
+<section id="autonomous-crazyflie-drone-racing" class="level1 title hero-section">
+<h1 class="title">Autonomous CrazyFlie Drone Racing</h1>
 <div class="subtitle">
-<p>A catchy one-line description of your project</p>
+<p>Software-in-the-loop simulation of gate-traversal drone racing using CrazySim, Gazebo, and ROS2</p>
 </div>
 <div class="author-list">
 <p><a href="https://github.com/tonyxiao501"><strong>Yafu Xiao</strong></a>, <a href="https://gooosy.github.io"><strong>Siyuan Gong</strong></a>, <a href="anayk3@illinois.edu"><strong>Anay Koorapaty</strong></a></p>
 </div>
 <div class="affiliation-list">
-<p>University of Illinois at Urbana Champaign, ECE 484</p>
+<p>University of Illinois at Urbana-Champaign, ECE 484</p>
 </div>
 <div class="button-row">
+<p><a href="https://github.com/safeautonomy-illinois-students/project-site-safeset2-0" class="btn btn-primary"><span class="btn-text"><i class="fa-brands fa-github" aria-label="github"></i> Code</span></a></p>
 <!-- [[ Paper]{.btn-text}](https://arxiv.org/pdf/XXXX.XXXXX){.btn .btn-primary} -->
 <!-- [[ arXiv]{.btn-text}](https://arxiv.org/abs/XXXX.XXXXX){.btn .btn-primary} -->
 <!-- [[ Video]{.btn-text}](https://www.youtube.com/watch?v=cSQTZoZPJzs){.btn .btn-primary} -->
@@ -198,8 +199,89 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="abstract" class="level2 section-title section-container">
 <h2 class="section-title anchored" data-anchor-id="abstract">Abstract</h2>
 <div class="abstract-text">
-<p>Replace this text with your project abstract. Describe the problem you are solving, the key insight or contribution of your work, and the main results. Keep it concise — typically 150–250 words. You can use <strong>bold</strong> and <em>italic</em> formatting to emphasize key terms.</p>
-<p>For example: We present a novel approach to [task] that achieves state-of-the-art results on [benchmark]. Our method leverages [key technique] to overcome [limitation of prior work]. Experiments demonstrate that our approach outperforms existing methods by [metric improvement] while requiring [efficiency gain].</p>
+<p>This project develops an autonomous flight stack for the <strong>CrazyFlie 2.1</strong> nano quadrotor targeting gate-traversal drone racing, using a Software-in-the-Loop (SITL) simulation environment. We build on <strong>CrazySim</strong> — a Gazebo Garden-based simulator that runs the real CrazyFlie firmware in simulation — combined with <strong>Crazyswarm2</strong> as the ROS 2 interface layer, enabling direct portability between simulation and hardware.</p>
+<p>The simulator provides three racing tracks (<strong>Circle</strong>, <strong>Lemniscate/figure-8</strong>, and <strong>U-Turn</strong>), each populated with physical drone gates. Our current baseline is a waypoint-following controller that navigates the drone through pre-defined gate coordinates. Going forward, we plan to develop a more capable controller — incorporating pose feedback and [planned approach, e.g., model predictive control / vision-based gate detection] — to achieve faster and more robust autonomous gate traversal. All development is done in ROS 2 Humble on Ubuntu 22.04.</p>
+</div>
+</section>
+<!-- ============================================================ -->
+<!-- APPROACH -->
+<!-- ============================================================ -->
+<section id="approach" class="level2 section-title section-container">
+<h2 class="section-title anchored" data-anchor-id="approach">Approach</h2>
+<div class="content-text">
+<section id="problem-statement" class="level3">
+<h3 class="anchored" data-anchor-id="problem-statement">Problem Statement</h3>
+<p>Given a pre-defined racing track with physical gates and a knowledge of waypoints that could lead the drone to cross the the gates and the knowledge of the world coordnate of the drone itself through motion capture, command a CrazyFlie 2.1 to autonomously take off, fly through every gate in order, and land — with no human intervention.</p>
+</section>
+<section id="simulation-environment" class="level3">
+<h3 class="anchored" data-anchor-id="simulation-environment">Simulation Environment</h3>
+<p>We use <strong>CrazySim</strong> (ICRA 2024) as our SITL platform. It compiles the real CrazyFlie firmware to run on a desktop, while Gazebo Garden provides physics and sensor simulation. The simulated drone communicates over UDP with <strong>crazyflie-lib-python (cflib)</strong>, and <strong>Crazyswarm2</strong> provides a ROS 2 abstraction layer exposing standard services (<code>Takeoff</code>, <code>Land</code>, <code>GoTo</code>) and topics (<code>/cf_1/pose</code>).</p>
+</section>
+<section id="sensors-information-used" class="level3">
+<h3 class="anchored" data-anchor-id="sensors-information-used">Sensors / Information Used</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Signal</th>
+<th>Source</th>
+<th>Topic / Interface</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>6-DOF pose (position + orientation)</td>
+<td>Gazebo motion-capture plugin</td>
+<td><code>/cf_1/pose</code> (PoseStamped)</td>
+</tr>
+<tr class="even">
+<td>Gate positions</td>
+<td>Known from track SDF world files</td>
+<td>Hard-coded / map</td>
+</tr>
+</tbody>
+</table>
+<p>The drone currently relies entirely on <strong>pose feedback</strong> from the simulated motion-capture system. No onboard camera or LIDAR is used at this stage.</p>
+</section>
+<section id="controller-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="controller-architecture">Controller Architecture</h3>
+<p>The current baseline is a <strong>waypoint follower</strong> implemented as a ROS 2 node (<code>WaypointControllerNode</code>). It operates as a state machine:</p>
+<pre><code>INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE</code></pre>
+<p>At each step the node calls the Crazyswarm2 <code>GoTo</code> service, which handles low-level position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware. Waypoint arrival is detected when the XY distance to the target drops below 0.3 m. +—————————–+ | Waypoints / Trajectory | +—————————–+ │ ▼ +—————————–+ | Outer-loop Controller | | (PID or MPC) | | Computes: | | φ_comm, θ_comm, ψ_comm, u_T | +—————————–+ │ ▼ +—————————–+ | Inner-loop PID (Firmware) | | Stabilizes angles and thrust| | Outputs motor commands | +—————————–+ │ ▼ +———–+ | Motors | +———–+ │ ▼ +———–+ | Drone | | Motion | +———–+ │ ▼ +—————————–+ | Sensors &amp; State Estimation | | (IMU, Motion Capture, Flow) | +—————————–+ │ └─────────────► Feedback to Outer-loop Controller</p>
+</section>
+<section id="block-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="block-diagram">Block Diagram</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        ROS 2 Node                               │
+│  ┌──────────────┐    GoTo/Takeoff/Land     ┌─────────────────┐  │
+│  │  Waypoint    │ ───────────────────────▶│  Crazyswarm2    │  │
+│  │  Controller  │                          │  (cflib backend)│  │
+│  │              │◀────────────────────────│                 │  │
+│  └──────────────┘    /cf_1/pose            └────────┬────────┘  │
+└───────────────────────────────────────────────────┼─────────────┘
+                                                    │ UDP (19850)
+                                         ┌──────────▼──────────────┐
+                                         │   CrazySim SITL         │
+                                         │  (CrazyFlie firmware    │
+                                         │   + Gazebo Garden)      │
+                                         └─────────────────────────┘</code></pre>
+</section>
+<section id="planned-extensions" class="level3">
+<h3 class="anchored" data-anchor-id="planned-extensions">Planned Extensions</h3>
+<ul>
+<li>Quantization of robustness and stability analysis through measuring lap time and gate-miss rate as quantitative metrics</li>
+<li>Set waypoints for the other two tracks, U-Turn and Lemniscate tracks.</li>
+<li>Implement a controller beyond the one beyond firmware burnt-in one. Create fine-grained controller aside from just going to the next waypoint in a rough and sparse set of waypoints with constant speed. We would want to have this project working just like MP2, but in SO(3). Test and compare between different longitudial and lateral controlling methods and compare the achievalbe speed of each of them through profilling the drone’s internal sensors across all three tracks.</li>
+<li>Advanced non-linear longitudial control of speed concerning SO(3) parameters</li>
+<li>Advanced lateral control concerning rotation with repsect to all three rotation matrices.</li>
+<li>Advanced part by part trojectory fitting by modeling the physically optimal trajectories that the drone could fly in highest speed and try to fit these partterns into the real world waypoints to achieve this speed</li>
+<li>If camera available: CV based pixel to world coordinates regression and then get rid of the knowledge of the knowledge on the current world coordinates of the drone(I.e., get rid of the motion capture system), but since we do not have access to any cameras, this is just a proposal</li>
+</ul>
+</section>
 </div>
 </section>
 <!-- ============================================================ -->
@@ -215,94 +297,89 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- ============================================================ -->
 <!-- RESULTS GALLERY -->
 <!-- ============================================================ -->
-<section id="results" class="level2 section-title section-container">
-<h2 class="section-title anchored" data-anchor-id="results">Results</h2>
-<div class="content-text">
-<p>Provide a brief description of the results shown below. Explain what the reader should observe and why it matters.</p>
-</div>
-<div class="results-grid">
-<div class="result-card">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-result1.svg" class="img-fluid figure-img"></p>
-<figcaption>Result 1 caption</figcaption>
-</figure>
-</div>
-</div>
-<div class="result-card">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-result2.svg" class="img-fluid figure-img"></p>
-<figcaption>Result 2 caption</figcaption>
-</figure>
-</div>
-</div>
-<div class="result-card">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-result3.svg" class="img-fluid figure-img"></p>
-<figcaption>Result 3 caption</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
+<!-- 
+::: {.section-container}
+
+## Results {.section-title}
+
+::: {.content-text}
+Provide a brief description of the results shown below. Explain what the
+reader should observe and why it matters.
+:::
+
+::: {.results-grid}
+
+::: {.result-card}
+![Result 1 caption](static/images/placeholder-result1.svg)
+:::
+
+::: {.result-card}
+![Result 2 caption](static/images/placeholder-result2.svg)
+:::
+
+::: {.result-card}
+![Result 3 caption](static/images/placeholder-result3.svg)
+:::
+
+:::
+
+:::
+-->
 <!-- ============================================================ -->
 <!-- QUALITATIVE COMPARISONS -->
 <!-- ============================================================ -->
-<section id="qualitative-comparisons" class="level2 section-title section-container">
-<h2 class="section-title anchored" data-anchor-id="qualitative-comparisons">Qualitative Comparisons</h2>
-<div class="content-text">
-<p>Describe the comparison setup — which baselines are you comparing against, and what should the reader look for in the side-by-side results.</p>
-</div>
-<div class="comparison-grid">
-<div class="comparison-item">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-ours.svg" class="img-fluid figure-img"></p>
-<figcaption>Ours</figcaption>
-</figure>
-</div>
-<p><strong>Ours</strong></p>
-</div>
-<div class="comparison-item">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-baseline.svg" class="img-fluid figure-img"></p>
-<figcaption>Baseline A</figcaption>
-</figure>
-</div>
-<p><strong>Baseline A</strong></p>
-</div>
-</div>
-</section>
+<!-- 
+::: {.section-container}
+
+## Qualitative Comparisons {.section-title}
+
+::: {.content-text}
+Describe the comparison setup — which baselines are you comparing against, and
+what should the reader look for in the side-by-side results.
+:::
+
+::: {.comparison-grid}
+
+::: {.comparison-item}
+![Ours](static/images/placeholder-ours.svg)
+
+**Ours**
+:::
+
+::: {.comparison-item}
+![Baseline A](static/images/placeholder-baseline.svg)
+
+**Baseline A**
+:::
+
+:::
+
+:::
+-->
 <!-- ============================================================ -->
 <!-- INTERACTIVE SLIDER (Optional) -->
 <!-- ============================================================ -->
-<section id="interpolation-demo" class="level2 section-title section-container">
-<h2 class="section-title anchored" data-anchor-id="interpolation-demo">Interpolation Demo</h2>
-<div class="content-text">
-<p>If your method supports interpolation or continuous control, you can add an interactive slider here. The example below shows how to set one up.</p>
-</div>
-<div class="interpolation-panel">
-<div class="interpolation-endpoints">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-start.svg" class="endpoint-img img-fluid figure-img"></p>
-<figcaption>Start</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="static/images/placeholder-end.svg" class="endpoint-img img-fluid figure-img"></p>
-<figcaption>End</figcaption>
-</figure>
-</div>
-</div>
+<!-- 
+::: {.section-container}
+
+## Interpolation Demo {.section-title}
+
+::: {.content-text}
+If your method supports interpolation or continuous control, you can add an
+interactive slider here. The example below shows how to set one up.
+:::
+
+::: {.interpolation-panel}
+
+::: {.interpolation-endpoints}
+![Start](static/images/placeholder-start.svg){.endpoint-img}
+
+![End](static/images/placeholder-end.svg){.endpoint-img}
+:::
+
 <input type="range" min="0" max="100" value="50" class="interpolation-slider" id="interpolation-slider">
-<div id="interpolation-value" class="interpolation-value">
-50%
-</div>
+<div id="interpolation-value" class="interpolation-value">50%</div>
+
 <script>
   const slider = document.getElementById('interpolation-slider');
   const display = document.getElementById('interpolation-value');
@@ -310,8 +387,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     display.textContent = this.value + '%';
   });
 </script>
-</div>
-</section>
+
+:::
+
+:::
+-->
 <!-- ============================================================ -->
 <!-- RELATED WORK -->
 <!-- ============================================================ -->
@@ -320,11 +400,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="content-text">
 <p>Here are some related works in this area:</p>
 <ul>
-<li><a href="https://example.com">Related Paper 1</a> introduces an idea similar to ours for [topic].</li>
-<li><a href="https://example.com">Related Paper 2</a> also addresses [problem] using [approach].</li>
-<li><a href="https://example.com">Related Paper 3</a> proposes [technique] which is complementary to our method.</li>
+<li><a href="https://github.com/IMRCLab/crazyswarm2">Crazyswarm2 Code Repository</a> provides a ROS2-based framework for controlling and coordinating Crazyflie quadrotor swarms.</li>
+<li><a href="https://arxiv.org/abs/1003.2005">Related Paper 1</a> proposes a geometric control method for stable trajectory tracking of quadrotor UAVs.</li>
+<li><a href="https://arxiv.org/abs/1811.08027">Related Paper 2</a> introduces a learning-based controller that models aerodynamic effects to improve drone landing stability.</li>
 </ul>
-<p>Check out <a href="https://example.com">this survey</a> for a comprehensive overview of the field.</p>
+<p>Check out <a href="https://ieeexplore.ieee.org/document/8827409/">this survey</a> for a comprehensive overview of quadrotor control methods.</p>
 </div>
 </section>
 <!-- ============================================================ -->
@@ -332,12 +412,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- ============================================================ -->
 <section id="bibtex" class="level2 section-title section-container">
 <h2 class="section-title anchored" data-anchor-id="bibtex">BibTeX</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">yourname2026project</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>    = {Author One and Author Two and Author Three},</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>     = {Your Project Title Here},</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span>   = {Conference or Journal Name},</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>      = {2026},</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">crazyswarm2</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={Crazyswarm2: ROS2-based swarm control for Crazyflie},</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={IMRCLab},</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2023},</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span>={<span class="ch">\url</span>{https://github.com/IMRCLab/crazyswarm2}}</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">lee2011controlcomplexmaneuversquadrotor</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="dt">title</span>={Control of Complex Maneuvers for a Quadrotor UAV using Geometric Methods on SE(3)}, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">author</span>={Taeyoung Lee and Melvin Leok and N. Harris McClamroch},</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">year</span>={2011},</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">eprint</span>={1003.2005},</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">archivePrefix</span>={arXiv},</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">primaryClass</span>={math.OC},</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">url</span>={https://arxiv.org/abs/1003.2005}, </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">@ARTICLE</span>{<span class="ot">8827409</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={Kim, Jinho and Gadsden, S. Andrew and Wilkerson, Stephen A.},</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span>={Canadian Journal of Electrical and Computer Engineering}, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={A Comprehensive Survey of Control Strategies for Autonomous Quadrotors}, </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2020},</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">volume</span>={43},</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">number</span>={1},</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">pages</span>={3-16},</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">keywords</span>={Rotors;Unmanned aerial vehicles;Aircraft propulsion;Military aircraft;Helicopters;Control systems;Autonomous;control;quadrotor;unmanned aerial vehicle (UAV);unmanned aircraft system (UAS)},</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">doi</span>={10.1109/CJECE.2019.2920938}}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">@inproceedings</span>{<span class="ot">Shi_2019</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>   <span class="dt">title</span>={Neural Lander: Stable Drone Landing Control Using Learned Dynamics},</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   <span class="dt">url</span>={http://dx.doi.org/10.1109/ICRA.2019.8794351},</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>   <span class="dt">DOI</span>={10.1109/icra.2019.8794351},</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>   <span class="dt">booktitle</span>={2019 International Conference on Robotics and Automation (ICRA)},</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>   <span class="dt">publisher</span>={IEEE},</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>   <span class="dt">author</span>={Shi, Guanya and Shi, Xichen and O’Connell, Michael and Yu, Rose and Azizzadenesheli, Kamyar and Anandkumar, Animashree and Yue, Yisong and Chung, Soon-Jo},</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>   <span class="dt">year</span>={2019},</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>   <span class="dt">month</span>=<span class="st">may</span>, <span class="st">pages</span>={9784–9790} }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <!-- ============================================================ -->
 <!-- FOOTER -->
