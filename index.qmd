@@ -84,7 +84,7 @@ rate), which feeds directly into the controller. We benchmark each method across
 :::
 
 
-## Abstract {.section-title}
+## Work Split {.section-title}
 Yafu Xia - Implementing control input logic for controllers in response to optimization objective errors
 
 Siyuan Gong - define optimization objective fed into controllers based on obstacle boundaries, velocity, position errors
