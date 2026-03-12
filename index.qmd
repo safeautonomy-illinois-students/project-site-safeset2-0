@@ -50,9 +50,7 @@ University of Illinois at Urbana-Champaign,  ECE 484
 
 ::: {.hero-teaser}
 
-<!-- Option B: Embed a video teaser (uncommented below) -->
-{{< video static/videos/pitch_presentation_simulation_working.mp4 >}}
-
+![Flowchat](static/images/system_architecture.svg){width=100% fig-align="center"}
 :::
 
 :::
@@ -209,10 +207,9 @@ We would want to have this project working just like MP2, but in SO(3). Test and
 
 ::: {.video-container}
 <!-- Replace with your local video embed -->
-<!-- {{< video static/videos/pitch_presentation_simulation_working.mp4 >}} -->
+{{< video static/videos/pitch_presentation_simulation_working.mp4 >}}
 :::
 
-![Flowchat](static/images/system_architecture.svg){width=80% fig-align="center"}
 
 :::
 
