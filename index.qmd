@@ -1,5 +1,5 @@
 ---
-pagetitle: "Your Project Title"
+pagetitle: "ECE 484 Final Project Site"
 format:
   html:
     toc: false
@@ -8,7 +8,7 @@ format:
 
 ::: {.hero-section}
 
-# Your Project Title Here {.title}
+#  {.title}
 
 ::: {.subtitle}
 A catchy one-line description of your project
@@ -16,25 +16,25 @@ A catchy one-line description of your project
 
 ::: {.author-list}
 
-[**Author One**](https://example.com)^1^,
-[**Author Two**](https://example.com)^2^,
-[**Author Three**](https://example.com)^1,2^
+[**Yafu Xiao**](https://github.com/tonyxiao501),
+[**Siyuan Gong**](https://gooosy.github.io),
+[**Anay Koorapaty**](anayk3@illinois.edu)
 
 :::
 
 ::: {.affiliation-list}
 
-^1^University Name,  ^2^Research Lab / Company
+University of Illinois at Urbana Champaign,  ECE 484
 
 :::
 
 ::: {.button-row}
 
-[[{{< fa file-pdf >}} Paper]{.btn-text}](https://arxiv.org/pdf/XXXX.XXXXX){.btn .btn-primary}
-[[{{< fa brands arxiv >}} arXiv]{.btn-text}](https://arxiv.org/abs/XXXX.XXXXX){.btn .btn-primary}
-[[{{< fa video >}} Video]{.btn-text}](https://www.youtube.com/watch?v=cSQTZoZPJzs){.btn .btn-primary}
-[[{{< fa brands github >}} Code]{.btn-text}](https://github.com/){.btn .btn-primary}
-[[{{< fa database >}} Data]{.btn-text}](https://example.com){.btn .btn-primary}
+<!-- [[{{< fa file-pdf >}} Paper]{.btn-text}](https://arxiv.org/pdf/XXXX.XXXXX){.btn .btn-primary} -->
+<!-- [[{{< fa brands arxiv >}} arXiv]{.btn-text}](https://arxiv.org/abs/XXXX.XXXXX){.btn .btn-primary} -->
+<!-- [[{{< fa video >}} Video]{.btn-text}](https://www.youtube.com/watch?v=cSQTZoZPJzs){.btn .btn-primary} -->
+<!-- [[{{< fa brands github >}} Code]{.btn-text}](https://github.com/){.btn .btn-primary} -->
+<!-- [[{{< fa database >}} Data]{.btn-text}](https://example.com){.btn .btn-primary} -->
 
 :::
 
@@ -49,12 +49,8 @@ A catchy one-line description of your project
 
 ::: {.hero-teaser}
 
-<!-- Option A: Use a static image as the teaser -->
-![Teaser figure showing your method overview or key result.](static/images/placeholder-teaser.svg){.teaser-img}
-
-<!-- Option B: Embed a video teaser (uncomment below, comment out image above)
-{{< video static/videos/teaser.mp4 >}}
--->
+<!-- Option B: Embed a video teaser (uncommented below) -->
+{{< video static/videos/pitch_presentation_simulation_working.mp4 >}}
 
 :::
 
@@ -94,8 +90,8 @@ approach outperforms existing methods by [metric improvement] while requiring
 ## Video {.section-title}
 
 ::: {.video-container}
-<!-- Replace with your YouTube or local video embed -->
-{{< video https://www.youtube.com/embed/cSQTZoZPJzs >}}
+<!-- Replace with your local video embed -->
+{{< video static/videos/pitch_presentation_simulation_working.mp4 >}}
 :::
 
 :::
