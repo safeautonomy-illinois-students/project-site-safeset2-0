@@ -210,9 +210,9 @@ We would want to have this project working just like MP2, but in SO(3). Test and
 ::: {.video-container}
 <!-- Replace with your local video embed -->
 <!-- {{< video static/videos/pitch_presentation_simulation_working.mp4 >}} -->
-![Flowchat](static/images/system_architecture.svg){width=80% fig-align="center"}
 :::
 
+![Flowchat](static/images/system_architecture.svg){width=80% fig-align="center"}
 
 :::
 
