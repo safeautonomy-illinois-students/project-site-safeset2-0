@@ -1,5 +1,5 @@
 ---
-pagetitle: "ECE 484 Final Project Site"
+pagetitle: "Autonomous CrazyFlie Drone Racing"
 format:
   html:
     toc: false
@@ -8,10 +8,10 @@ format:
 
 ::: {.hero-section}
 
-#  {.title}
+# Autonomous CrazyFlie Drone Racing {.title}
 
 ::: {.subtitle}
-A catchy one-line description of your project
+Software-in-the-loop simulation of gate-traversal drone racing using CrazySim, Gazebo, and ROS2
 :::
 
 ::: {.author-list}
@@ -24,11 +24,12 @@ A catchy one-line description of your project
 
 ::: {.affiliation-list}
 
-University of Illinois at Urbana Champaign,  ECE 484
+University of Illinois at Urbana-Champaign,  ECE 484
 
 :::
 
 ::: {.button-row}
+[[{{< fa brands github >}} Code]{.btn-text}](https://github.com/safeautonomy-illinois-students/project-site-safeset2-0){.btn .btn-primary}
 
 <!-- [[{{< fa file-pdf >}} Paper]{.btn-text}](https://arxiv.org/pdf/XXXX.XXXXX){.btn .btn-primary} -->
 <!-- [[{{< fa brands arxiv >}} arXiv]{.btn-text}](https://arxiv.org/abs/XXXX.XXXXX){.btn .btn-primary} -->
@@ -66,16 +67,91 @@ University of Illinois at Urbana Champaign,  ECE 484
 ## Abstract {.section-title}
 
 ::: {.abstract-text}
-Replace this text with your project abstract. Describe the problem you are
-solving, the key insight or contribution of your work, and the main results.
-Keep it concise — typically 150–250 words. You can use **bold** and *italic*
-formatting to emphasize key terms.
+This project develops an autonomous flight stack for the **CrazyFlie 2.1** nano quadrotor targeting
+gate-traversal drone racing, using a Software-in-the-Loop (SITL) simulation environment.
+We build on **CrazySim** — a Gazebo Garden-based simulator that runs the real CrazyFlie firmware
+in simulation — combined with **Crazyswarm2** as the ROS 2 interface layer, enabling direct
+portability between simulation and hardware.
 
-For example: We present a novel approach to [task] that achieves
-state-of-the-art results on [benchmark]. Our method leverages [key technique]
-to overcome [limitation of prior work]. Experiments demonstrate that our
-approach outperforms existing methods by [metric improvement] while requiring
-[efficiency gain].
+The simulator provides three racing tracks (**Circle**, **Lemniscate/figure-8**, and **U-Turn**),
+each populated with physical drone gates. Our current baseline is a waypoint-following controller
+that navigates the drone through pre-defined gate coordinates. Going forward, we plan to develop
+a more capable controller — incorporating pose feedback and [planned approach, e.g., model predictive
+control / vision-based gate detection] — to achieve faster and more robust autonomous gate traversal.
+All development is done in ROS 2 Humble on Ubuntu 22.04.
+:::
+
+:::
+
+
+<!-- ============================================================ -->
+<!-- APPROACH -->
+<!-- ============================================================ -->
+
+::: {.section-container}
+
+## Approach {.section-title}
+
+::: {.content-text}
+
+### Problem Statement
+Given a pre-defined racing track with physical gates, command a CrazyFlie 2.1 to autonomously
+take off, fly through every gate in order, and land — with no human intervention.
+
+### Simulation Environment
+We use **CrazySim** (ICRA 2024) as our SITL platform. It compiles the real CrazyFlie firmware
+to run on a desktop, while Gazebo Garden provides physics and sensor simulation. The simulated
+drone communicates over UDP with **crazyflie-lib-python (cflib)**, and **Crazyswarm2** provides
+a ROS 2 abstraction layer exposing standard services (`Takeoff`, `Land`, `GoTo`) and topics
+(`/cf_1/pose`).
+
+### Sensors / Information Used
+
+| Signal | Source | Topic / Interface |
+|---|---|---|
+| 6-DOF pose (position + orientation) | Gazebo motion-capture plugin | `/cf_1/pose` (PoseStamped) |
+| Gate positions | Known from track SDF world files | Hard-coded / map |
+
+The drone currently relies entirely on **pose feedback** from the simulated motion-capture system.
+No onboard camera or LIDAR is used at this stage.
+
+### Controller Architecture
+
+The current baseline is a **waypoint follower** implemented as a ROS 2 node
+(`WaypointControllerNode`). It operates as a state machine:
+
+```
+INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE
+```
+
+At each step the node calls the Crazyswarm2 `GoTo` service, which handles low-level
+position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware.
+Waypoint arrival is detected when the XY distance to the target drops below 0.3 m.
+
+### Block Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        ROS 2 Node                               │
+│  ┌──────────────┐    GoTo/Takeoff/Land     ┌─────────────────┐  │
+│  │  Waypoint    │ ────────────────────────▶│  Crazyswarm2    │  │
+│  │  Controller  │                          │  (cflib backend)│  │
+│  │              │◀─────────────────────────│                 │  │
+│  └──────────────┘    /cf_1/pose            └────────┬────────┘  │
+└───────────────────────────────────────────────────┼─────────────┘
+                                                    │ UDP (19850)
+                                         ┌──────────▼──────────────┐
+                                         │   CrazySim SITL          │
+                                         │  (CrazyFlie firmware     │
+                                         │   + Gazebo Garden)       │
+                                         └─────────────────────────┘
+```
+
+### Planned Extensions
+- [Describe your next controller idea here, e.g., MPC, velocity control, vision-based detection]
+- Tuning waypoint sequences for the Lemniscate and U-Turn tracks
+- Measuring lap time and gate-miss rate as quantitative metrics
+
 :::
 
 :::
@@ -101,6 +177,7 @@ approach outperforms existing methods by [metric improvement] while requiring
 <!-- RESULTS GALLERY -->
 <!-- ============================================================ -->
 
+<!-- 
 ::: {.section-container}
 
 ## Results {.section-title}
@@ -127,12 +204,12 @@ reader should observe and why it matters.
 :::
 
 :::
-
+-->
 
 <!-- ============================================================ -->
 <!-- QUALITATIVE COMPARISONS -->
 <!-- ============================================================ -->
-
+<!-- 
 ::: {.section-container}
 
 ## Qualitative Comparisons {.section-title}
@@ -159,12 +236,13 @@ what should the reader look for in the side-by-side results.
 :::
 
 :::
-
+-->
 
 <!-- ============================================================ -->
 <!-- INTERACTIVE SLIDER (Optional) -->
 <!-- ============================================================ -->
 
+<!-- 
 ::: {.section-container}
 
 ## Interpolation Demo {.section-title}
@@ -196,7 +274,7 @@ interactive slider here. The example below shows how to set one up.
 :::
 
 :::
-
+-->
 
 <!-- ============================================================ -->
 <!-- RELATED WORK -->
@@ -210,11 +288,11 @@ interactive slider here. The example below shows how to set one up.
 
 Here are some related works in this area:
 
-- [Related Paper 1](https://example.com) introduces an idea similar to ours for [topic].
-- [Related Paper 2](https://example.com) also addresses [problem] using [approach].
-- [Related Paper 3](https://example.com) proposes [technique] which is complementary to our method.
+- [Crazyswarm2 Code Repository](https://github.com/IMRCLab/crazyswarm2) provides a ROS2-based framework for controlling and coordinating Crazyflie quadrotor swarms.
+- [Related Paper 1](https://arxiv.org/abs/1003.2005) proposes a geometric control method for stable trajectory tracking of quadrotor UAVs.
+- [Related Paper 2](https://arxiv.org/abs/1811.08027) introduces a learning-based controller that models aerodynamic effects to improve drone landing stability.
 
-Check out [this survey](https://example.com) for a comprehensive overview of the field.
+Check out [this survey](https://ieeexplore.ieee.org/document/8827409/) for a comprehensive overview of quadrotor control methods.
 :::
 
 :::
@@ -229,14 +307,47 @@ Check out [this survey](https://example.com) for a comprehensive overview of the
 ## BibTeX {.section-title}
 
 ```bibtex
-@article{yourname2026project,
-  author    = {Author One and Author Two and Author Three},
-  title     = {Your Project Title Here},
-  journal   = {Conference or Journal Name},
-  year      = {2026},
+@misc{crazyswarm2,
+  title={Crazyswarm2: ROS2-based swarm control for Crazyflie},
+  author={IMRCLab},
+  year={2023},
+  howpublished={\url{https://github.com/IMRCLab/crazyswarm2}}
 }
 ```
-
+```bibtex
+@misc{lee2011controlcomplexmaneuversquadrotor,
+      title={Control of Complex Maneuvers for a Quadrotor UAV using Geometric Methods on SE(3)}, 
+      author={Taeyoung Lee and Melvin Leok and N. Harris McClamroch},
+      year={2011},
+      eprint={1003.2005},
+      archivePrefix={arXiv},
+      primaryClass={math.OC},
+      url={https://arxiv.org/abs/1003.2005}, 
+}
+```
+```bibtex
+@ARTICLE{8827409,
+  author={Kim, Jinho and Gadsden, S. Andrew and Wilkerson, Stephen A.},
+  journal={Canadian Journal of Electrical and Computer Engineering}, 
+  title={A Comprehensive Survey of Control Strategies for Autonomous Quadrotors}, 
+  year={2020},
+  volume={43},
+  number={1},
+  pages={3-16},
+  keywords={Rotors;Unmanned aerial vehicles;Aircraft propulsion;Military aircraft;Helicopters;Control systems;Autonomous;control;quadrotor;unmanned aerial vehicle (UAV);unmanned aircraft system (UAS)},
+  doi={10.1109/CJECE.2019.2920938}}
+```
+```bibtex
+@inproceedings{Shi_2019,
+   title={Neural Lander: Stable Drone Landing Control Using Learned Dynamics},
+   url={http://dx.doi.org/10.1109/ICRA.2019.8794351},
+   DOI={10.1109/icra.2019.8794351},
+   booktitle={2019 International Conference on Robotics and Automation (ICRA)},
+   publisher={IEEE},
+   author={Shi, Guanya and Shi, Xichen and O’Connell, Michael and Yu, Rose and Azizzadenesheli, Kamyar and Anandkumar, Animashree and Yue, Yisong and Chung, Soon-Jo},
+   year={2019},
+   month=may, pages={9784–9790} }
+```
 :::
 
 
