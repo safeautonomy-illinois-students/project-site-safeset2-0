@@ -85,12 +85,14 @@ rate), which feeds directly into the controller. We benchmark each method across
 
 
 ## Work Split {.section-title}
-Yafu Xia - Implementing control input logic for controllers in response to optimization objective errors
+
+::: {.content-text}
+Yafu Xiao - Implementing control input logic for controllers in response to optimization objective errors
 
 Siyuan Gong - define optimization objective fed into controllers based on obstacle boundaries, velocity, position errors
 
 Anay Koorapaty - exploring different trajectory planning algorithms and analyzing their tradeoffs on different tracks along with implementing lookahead logic
-
+:::
 <!-- ============================================================ -->
 <!-- APPROACH -->
 <!-- ============================================================ -->

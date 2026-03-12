@@ -1,0 +1,165 @@
+<svg width="1100" height="470" xmlns="http://www.w3.org/2000/svg" font-family="'Arial','Helvetica',sans-serif">
+  <rect width="1100" height="470" fill="white"/>
+
+  <defs>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1D4ED8"/>
+    </marker>
+    <marker id="arr-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#B45309"/>
+    </marker>
+    <marker id="arr-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#166534"/>
+    </marker>
+    <marker id="arr-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6D28D9"/>
+    </marker>
+    <marker id="arr-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7C3AED"/>
+    </marker>
+  </defs>
+
+  <!-- ═══ PANEL 1 — Controller Module ═══ -->
+  <rect x="18" y="18" width="308" height="428" rx="10"
+        fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5" stroke-dasharray="9,4"/>
+  <text x="37" y="50" font-size="17" font-weight="bold" fill="#1E3A5F">Controller Module</text>
+
+  <!-- ── Current Baseline sub-section ── -->
+  <rect x="30" y="58" width="284" height="158" rx="7"
+        fill="#DBEAFE" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="44" y="76" font-size="10" font-weight="bold" fill="#6B7280">CURRENT BASELINE</text>
+
+  <!-- file badge -->
+  <rect x="44" y="82" width="256" height="30" rx="5" fill="#1D4ED8"/>
+  <text x="172" y="102" text-anchor="middle" font-size="13" font-weight="bold" fill="white">waypoint_follower.py</text>
+
+  <!-- state machine -->
+  <rect x="44"  y="124" width="38"  height="22" rx="4" fill="#1D4ED8"/>
+  <text x="63"  y="140" text-anchor="middle" font-size="9" fill="white">INIT</text>
+  <line x1="83"  y1="135" x2="90"  y2="135" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="92"  y="124" width="58"  height="22" rx="4" fill="#1D4ED8"/>
+  <text x="121" y="140" text-anchor="middle" font-size="9" fill="white">TAKEOFF</text>
+  <line x1="151" y1="135" x2="158" y2="135" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="160" y="124" width="72"  height="22" rx="4" fill="#1D4ED8"/>
+  <text x="196" y="140" text-anchor="middle" font-size="9" fill="white">NAVIGATE</text>
+  <line x1="233" y1="135" x2="240" y2="135" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="242" y="124" width="44"  height="22" rx="4" fill="#1D4ED8"/>
+  <text x="264" y="140" text-anchor="middle" font-size="9" fill="white">LAND</text>
+
+  <!-- GoTo note -->
+  <text x="44" y="168" font-size="11" fill="#1D4ED8" font-weight="bold">GoTo service calls  →</text>
+  <text x="44" y="184" font-size="10" fill="#64748B">stop-and-go at each waypoint</text>
+  <text x="44" y="200" font-size="10" fill="#64748B">speed limited to ~0.5 m/s</text>
+
+  <!-- ── Upgrade label ── -->
+  <line x1="30" y1="226" x2="314" y2="226" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="172" y="241" text-anchor="middle" font-size="11" font-weight="bold" fill="#7C3AED">↓  Planned Upgrade</text>
+
+  <!-- ── Planned sub-section ── -->
+  <rect x="30" y="248" width="284" height="184" rx="7"
+        fill="#F5F0FF" stroke="#A78BFA" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="44" y="266" font-size="10" font-weight="bold" fill="#7C3AED">PLANNED</text>
+
+  <!-- Min-snap Planner box -->
+  <rect x="44" y="272" width="256" height="44" rx="5" fill="#5B21B6"/>
+  <text x="172" y="291" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Min-snap Trajectory Planner</text>
+  <text x="172" y="308" text-anchor="middle" font-size="10" fill="#DDD6FE">smooth r(t) through all gate waypoints</text>
+
+  <!-- arrow down -->
+  <line x1="172" y1="316" x2="172" y2="332" stroke="#7C3AED" stroke-width="1.8" marker-end="url(#arr-violet)"/>
+
+  <!-- PD Controller box -->
+  <rect x="44" y="334" width="256" height="44" rx="5" fill="#5B21B6"/>
+  <text x="172" y="353" text-anchor="middle" font-size="13" font-weight="bold" fill="white">PD Full-State Controller</text>
+  <text x="172" y="370" text-anchor="middle" font-size="10" fill="#DDD6FE">tracks r(t) via pose feedback</text>
+
+  <!-- cmd_full_state note -->
+  <text x="44" y="404" font-size="11" fill="#7C3AED" font-weight="bold">cmd_full_state  →</text>
+  <text x="44" y="420" font-size="10" fill="#64748B">continuous smooth flight</text>
+
+
+  <!-- ═══ PANEL 2 — Crazyswarm2 ═══ -->
+  <rect x="358" y="62" width="222" height="374" rx="10"
+        fill="#FFFBEB" stroke="#D97706" stroke-width="2.5" stroke-dasharray="9,4"/>
+  <text x="378" y="94" font-size="17" font-weight="bold" fill="#78350F">Crazyswarm2</text>
+  <line x1="378" y1="108" x2="560" y2="108" stroke="#FDE68A" stroke-width="1"/>
+
+  <!-- service badges (baseline) -->
+  <text x="378" y="126" font-size="10" fill="#A16207">services (current)</text>
+  <rect x="378" y="132" width="182" height="24" rx="4" fill="#92400E"/>
+  <text x="469" y="149" text-anchor="middle" font-size="11" fill="white">/cf_1/takeoff</text>
+  <rect x="378" y="161" width="182" height="24" rx="4" fill="#92400E"/>
+  <text x="469" y="178" text-anchor="middle" font-size="11" fill="white">/cf_1/go_to</text>
+  <rect x="378" y="190" width="182" height="24" rx="4" fill="#92400E"/>
+  <text x="469" y="207" text-anchor="middle" font-size="11" fill="white">/cf_1/land</text>
+
+  <line x1="378" y1="228" x2="560" y2="228" stroke="#FDE68A" stroke-width="1" stroke-dasharray="5,3"/>
+
+  <!-- cmd_full_state badge (planned) -->
+  <text x="378" y="248" font-size="10" fill="#7C3AED">topic (planned)</text>
+  <rect x="378" y="254" width="182" height="24" rx="4" fill="#5B21B6"
+        stroke="#A78BFA" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="469" y="271" text-anchor="middle" font-size="11" fill="white">cmd_full_state</text>
+
+  <line x1="378" y1="294" x2="560" y2="294" stroke="#FDE68A" stroke-width="1"/>
+
+  <!-- pose topic badge -->
+  <text x="378" y="312" font-size="10" fill="#A16207">topic (feedback)</text>
+  <rect x="378" y="318" width="182" height="24" rx="4" fill="#6D28D9"/>
+  <text x="469" y="335" text-anchor="middle" font-size="11" fill="white">/cf_1/pose</text>
+
+
+  <!-- ═══ PANEL 3 — CrazySim SITL ═══ -->
+  <rect x="612" y="18" width="470" height="428" rx="10"
+        fill="#F0FDF4" stroke="#16A34A" stroke-width="2.5" stroke-dasharray="9,4"/>
+  <text x="631" y="50" font-size="17" font-weight="bold" fill="#14532D">CrazySim SITL</text>
+
+  <!-- Firmware box -->
+  <rect x="631" y="60" width="432" height="80" rx="7" fill="#166534"/>
+  <text x="847" y="93"  text-anchor="middle" font-size="14" font-weight="bold" fill="white">CrazyFlie Firmware</text>
+  <text x="847" y="114" text-anchor="middle" font-size="12" fill="#86EFAC">position  ·  attitude  ·  thrust control</text>
+  <text x="847" y="132" text-anchor="middle" font-size="11" fill="#A7F3D0">receives commands from Crazyswarm2</text>
+
+  <!-- arrow down -->
+  <line x1="847" y1="141" x2="847" y2="174" stroke="#16A34A" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- Gazebo box -->
+  <rect x="631" y="176" width="432" height="80" rx="7" fill="#166534"/>
+  <text x="847" y="209" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Gazebo Garden</text>
+  <text x="847" y="230" text-anchor="middle" font-size="12" fill="#86EFAC">physics simulation  +  sensor plugins</text>
+  <text x="847" y="250" text-anchor="middle" font-size="11" fill="#A7F3D0">publishes  /cf_1/pose</text>
+
+  <!-- arrow down -->
+  <line x1="847" y1="257" x2="847" y2="290" stroke="#16A34A" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- Tracks box -->
+  <rect x="631" y="292" width="432" height="56" rx="7" fill="#166534"/>
+  <text x="847" y="318" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Racing Tracks</text>
+  <text x="847" y="338" text-anchor="middle" font-size="12" fill="#86EFAC">Circle  ·  U-Turn  ·  Lemniscate</text>
+
+
+  <!-- ═══ ARROWS Panel 1 → Panel 2 ═══ -->
+  <!-- Baseline: 3 service call arrows (solid) -->
+  <line x1="327" y1="149" x2="357" y2="149" stroke="#B45309" stroke-width="2" marker-end="url(#arr-amber)"/>
+  <line x1="327" y1="175" x2="357" y2="175" stroke="#B45309" stroke-width="2" marker-end="url(#arr-amber)"/>
+  <line x1="327" y1="201" x2="357" y2="201" stroke="#B45309" stroke-width="2" marker-end="url(#arr-amber)"/>
+  <text x="342" y="136" text-anchor="middle" font-size="10" fill="#92400E" font-weight="bold">calls</text>
+
+  <!-- Planned: cmd_full_state arrow (dashed) -->
+  <line x1="327" y1="266" x2="357" y2="266" stroke="#7C3AED" stroke-width="2"
+        stroke-dasharray="5,3" marker-end="url(#arr-violet)"/>
+  <text x="342" y="258" text-anchor="middle" font-size="9" fill="#7C3AED" font-weight="bold">planned</text>
+
+  <!-- ═══ ARROW Panel 2 → Panel 3 ═══ -->
+  <line x1="581" y1="175" x2="610" y2="175" stroke="#B45309" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+  <!-- ═══ FEEDBACK — /cf_1/pose (Panel 3 → Panel 1) ═══ -->
+  <path d="M 612,216 H 587 V 450 H 50 V 444"
+        fill="none" stroke="#6D28D9" stroke-width="2.5"
+        stroke-dasharray="6,3" marker-end="url(#arr-purple)"/>
+  <text x="360" y="464" text-anchor="middle" font-size="12"
+        fill="#6D28D9" font-weight="bold">/cf_1/pose  (pose feedback)</text>
+</svg>
