@@ -72,10 +72,11 @@ firmware — so anything we prove in sim can transfer to real hardware. Three tr
 **Circle**, **U-turn**, and **Lemniscate**, each with physical gate obstacles.
 
 Current baseline is a stop-and-go waypoint follower (`waypoint_follower.py`) that calls `GoTo` with
-pre-known gate coordinates. Our goal is to replace it with a **minimum-snap trajectory tracker** —
-pre-compute a smooth polynomial path through all gates, then track it live with a PD full-state
-controller publishing `cmd_full_state`. This eliminates the stop-at-every-waypoint behavior and
-produces fast, physically smooth flight without any vision.
+pre-known gate coordinates — functional, but slow and jerky. Our main goal is to build and compare
+better controllers: starting with a **minimum-snap trajectory tracker** paired with a PD full-state
+feedback loop, then working toward non-linear SO(3) control and part-by-part trajectory fitting that
+pushes the drone to its physical speed limit. We benchmark each method across all three tracks by
+**lap time** and **gate-miss rate**, testing both longitudinal and lateral control strategies.
 :::
 
 :::
