@@ -123,64 +123,7 @@ INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE
 At each step the node calls the Crazyswarm2 `GoTo` service, which handles low-level
 position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware.
 Waypoint arrival is detected when the XY distance to the target drops below 0.3 m.
-```
-          +-----------------------------+
-          |      Waypoints / Trajectory |
-          +-----------------------------+
-                        │
-                        ▼
-          +-----------------------------+
-          | Outer-loop Controller       |
-          | (PID or MPC)                |
-          | Computes:                   |
-          | φ_comm, θ_comm, ψ_comm, u_T |
-          +-----------------------------+
-                        │
-                        ▼
-          +-----------------------------+
-          | Inner-loop PID (Firmware)   |
-          | Stabilizes angles and thrust|
-          | Outputs motor commands      |
-          +-----------------------------+
-                        │
-                        ▼
-                  +-----------+
-                  |   Motors  |
-                  +-----------+
-                        │
-                        ▼
-                  +-----------+
-                  |   Drone   |
-                  |  Motion   |
-                  +-----------+
-                        │
-                        ▼
-          +-----------------------------+
-          |  Sensors & State Estimation |
-          | (IMU, Motion Capture, Flow) |
-          +-----------------------------+
-                        │
-                        └─────────────► Feedback to Outer-loop Controller
-```
-
-### Block Diagram
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ROS 2 Node                               │
-│  ┌──────────────┐    GoTo/Takeoff/Land     ┌─────────────────┐  │
-│  │  Waypoint    │ ───────────────────────▶│  Crazyswarm2    │  │
-│  │  Controller  │                          │  (cflib backend)│  │
-│  │              │◀────────────────────────│                 │  │
-│  └──────────────┘    /cf_1/pose            └────────┬────────┘  │
-└───────────────────────────────────────────────────┼─────────────┘
-                                                    │ UDP (19850)
-                                         ┌──────────▼──────────────┐
-                                         │   CrazySim SITL         │
-                                         │  (CrazyFlie firmware    │
-                                         │   + Gazebo Garden)      │
-                                         └─────────────────────────┘
-```
+![Controller](static/images/controller_diagram.svg)
 
 ### Planned Extensions
 - Quantization of robustness and stability analysis through measuring lap time and gate-miss rate as quantitative metrics
