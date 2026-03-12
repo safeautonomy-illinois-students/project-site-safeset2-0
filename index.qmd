@@ -49,8 +49,8 @@ University of Illinois at Urbana-Champaign,  ECE 484
 ::: {.section-container}
 
 ::: {.hero-teaser}
-
-![Flowchat](static/images/system_architecture.svg){width=100% fig-align="center"}
+![](static/images/system_overview.svg){width=100% fig-align="center"}
+![](static/images/system_architecture.svg){width=100% fig-align="center"}
 :::
 
 :::
@@ -75,7 +75,9 @@ Current baseline is a stop-and-go waypoint follower (`waypoint_follower.py`) tha
 pre-known gate coordinates — functional, but slow and jerky. Our main goal is to build and compare
 better controllers: starting with a **minimum-snap trajectory tracker** paired with a PD full-state
 feedback loop, then working toward non-linear SO(3) control and part-by-part trajectory fitting that
-pushes the drone to its physical speed limit. We benchmark each method across all three tracks by
+pushes the drone to its physical speed limit. On the perception side, we plan to use a **Kalman filter** to
+fuse noisy pose and IMU readings into a clean state estimate (position, velocity, attitude, angular
+rate), which feeds directly into the controller. We benchmark each method across all three tracks by
 **lap time** and **gate-miss rate**, testing both longitudinal and lateral control strategies.
 :::
 
