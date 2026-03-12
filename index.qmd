@@ -126,6 +126,7 @@ INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE
 At each step the node calls the Crazyswarm2 `GoTo` service, which handles low-level
 position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware.
 Waypoint arrival is detected when the XY distance to the target drops below 0.3 m.
+```
           +-----------------------------+
           |      Waypoints / Trajectory |
           +-----------------------------+
@@ -163,6 +164,7 @@ Waypoint arrival is detected when the XY distance to the target drops below 0.3 
           +-----------------------------+
                         │
                         └─────────────► Feedback to Outer-loop Controller
+```
 
 ### Block Diagram
 

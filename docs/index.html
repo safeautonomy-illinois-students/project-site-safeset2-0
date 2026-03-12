@@ -251,7 +251,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="controller-architecture">Controller Architecture</h3>
 <p>The current baseline is a <strong>waypoint follower</strong> implemented as a ROS 2 node (<code>WaypointControllerNode</code>). It operates as a state machine:</p>
 <pre><code>INIT → TAKEOFF → NAVIGATE (waypoint-by-waypoint) → LAND → DONE</code></pre>
-<p>At each step the node calls the Crazyswarm2 <code>GoTo</code> service, which handles low-level position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware. Waypoint arrival is detected when the XY distance to the target drops below 0.3 m. +—————————–+ | Waypoints / Trajectory | +—————————–+ │ ▼ +—————————–+ | Outer-loop Controller | | (PID or MPC) | | Computes: | | φ_comm, θ_comm, ψ_comm, u_T | +—————————–+ │ ▼ +—————————–+ | Inner-loop PID (Firmware) | | Stabilizes angles and thrust| | Outputs motor commands | +—————————–+ │ ▼ +———–+ | Motors | +———–+ │ ▼ +———–+ | Drone | | Motion | +———–+ │ ▼ +—————————–+ | Sensors &amp; State Estimation | | (IMU, Motion Capture, Flow) | +—————————–+ │ └─────────────► Feedback to Outer-loop Controller</p>
+<p>At each step the node calls the Crazyswarm2 <code>GoTo</code> service, which handles low-level position control, altitude hold, and trajectory smoothing inside the CrazyFlie firmware. Waypoint arrival is detected when the XY distance to the target drops below 0.3 m.</p>
+<pre><code>          +-----------------------------+
+          |      Waypoints / Trajectory |
+          +-----------------------------+
+                        │
+                        ▼
+          +-----------------------------+
+          | Outer-loop Controller       |
+          | (PID or MPC)                |
+          | Computes:                   |
+          | φ_comm, θ_comm, ψ_comm, u_T |
+          +-----------------------------+
+                        │
+                        ▼
+          +-----------------------------+
+          | Inner-loop PID (Firmware)   |
+          | Stabilizes angles and thrust|
+          | Outputs motor commands      |
+          +-----------------------------+
+                        │
+                        ▼
+                  +-----------+
+                  |   Motors  |
+                  +-----------+
+                        │
+                        ▼
+                  +-----------+
+                  |   Drone   |
+                  |  Motion   |
+                  +-----------+
+                        │
+                        ▼
+          +-----------------------------+
+          |  Sensors &amp; State Estimation |
+          | (IMU, Motion Capture, Flow) |
+          +-----------------------------+
+                        │
+                        └─────────────► Feedback to Outer-loop Controller</code></pre>
 </section>
 <section id="block-diagram" class="level3">
 <h3 class="anchored" data-anchor-id="block-diagram">Block Diagram</h3>
@@ -412,40 +449,40 @@ interactive slider here. The example below shows how to set one up.
 <!-- ============================================================ -->
 <section id="bibtex" class="level2 section-title section-container">
 <h2 class="section-title anchored" data-anchor-id="bibtex">BibTeX</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">crazyswarm2</span>,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={Crazyswarm2: ROS2-based swarm control for Crazyflie},</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={IMRCLab},</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2023},</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span>={<span class="ch">\url</span>{https://github.com/IMRCLab/crazyswarm2}}</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">lee2011controlcomplexmaneuversquadrotor</span>,</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="dt">title</span>={Control of Complex Maneuvers for a Quadrotor UAV using Geometric Methods on SE(3)}, </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">author</span>={Taeyoung Lee and Melvin Leok and N. Harris McClamroch},</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">year</span>={2011},</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">eprint</span>={1003.2005},</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">archivePrefix</span>={arXiv},</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">primaryClass</span>={math.OC},</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">url</span>={https://arxiv.org/abs/1003.2005}, </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">@ARTICLE</span>{<span class="ot">8827409</span>,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={Kim, Jinho and Gadsden, S. Andrew and Wilkerson, Stephen A.},</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span>={Canadian Journal of Electrical and Computer Engineering}, </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={A Comprehensive Survey of Control Strategies for Autonomous Quadrotors}, </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2020},</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">volume</span>={43},</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">number</span>={1},</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">pages</span>={3-16},</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">keywords</span>={Rotors;Unmanned aerial vehicles;Aircraft propulsion;Military aircraft;Helicopters;Control systems;Autonomous;control;quadrotor;unmanned aerial vehicle (UAV);unmanned aircraft system (UAS)},</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">doi</span>={10.1109/CJECE.2019.2920938}}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">@inproceedings</span>{<span class="ot">Shi_2019</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>   <span class="dt">title</span>={Neural Lander: Stable Drone Landing Control Using Learned Dynamics},</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   <span class="dt">url</span>={http://dx.doi.org/10.1109/ICRA.2019.8794351},</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>   <span class="dt">DOI</span>={10.1109/icra.2019.8794351},</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>   <span class="dt">booktitle</span>={2019 International Conference on Robotics and Automation (ICRA)},</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>   <span class="dt">publisher</span>={IEEE},</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>   <span class="dt">author</span>={Shi, Guanya and Shi, Xichen and O’Connell, Michael and Yu, Rose and Azizzadenesheli, Kamyar and Anandkumar, Animashree and Yue, Yisong and Chung, Soon-Jo},</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>   <span class="dt">year</span>={2019},</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>   <span class="dt">month</span>=<span class="st">may</span>, <span class="st">pages</span>={9784–9790} }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">crazyswarm2</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={Crazyswarm2: ROS2-based swarm control for Crazyflie},</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={IMRCLab},</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2023},</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span>={<span class="ch">\url</span>{https://github.com/IMRCLab/crazyswarm2}}</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">lee2011controlcomplexmaneuversquadrotor</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="dt">title</span>={Control of Complex Maneuvers for a Quadrotor UAV using Geometric Methods on SE(3)}, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">author</span>={Taeyoung Lee and Melvin Leok and N. Harris McClamroch},</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">year</span>={2011},</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">eprint</span>={1003.2005},</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">archivePrefix</span>={arXiv},</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">primaryClass</span>={math.OC},</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">url</span>={https://arxiv.org/abs/1003.2005}, </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">@ARTICLE</span>{<span class="ot">8827409</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>={Kim, Jinho and Gadsden, S. Andrew and Wilkerson, Stephen A.},</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span>={Canadian Journal of Electrical and Computer Engineering}, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>={A Comprehensive Survey of Control Strategies for Autonomous Quadrotors}, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>={2020},</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">volume</span>={43},</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">number</span>={1},</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">pages</span>={3-16},</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">keywords</span>={Rotors;Unmanned aerial vehicles;Aircraft propulsion;Military aircraft;Helicopters;Control systems;Autonomous;control;quadrotor;unmanned aerial vehicle (UAV);unmanned aircraft system (UAS)},</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">doi</span>={10.1109/CJECE.2019.2920938}}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">@inproceedings</span>{<span class="ot">Shi_2019</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>   <span class="dt">title</span>={Neural Lander: Stable Drone Landing Control Using Learned Dynamics},</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>   <span class="dt">url</span>={http://dx.doi.org/10.1109/ICRA.2019.8794351},</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>   <span class="dt">DOI</span>={10.1109/icra.2019.8794351},</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>   <span class="dt">booktitle</span>={2019 International Conference on Robotics and Automation (ICRA)},</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>   <span class="dt">publisher</span>={IEEE},</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>   <span class="dt">author</span>={Shi, Guanya and Shi, Xichen and O’Connell, Michael and Yu, Rose and Azizzadenesheli, Kamyar and Anandkumar, Animashree and Yue, Yisong and Chung, Soon-Jo},</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>   <span class="dt">year</span>={2019},</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>   <span class="dt">month</span>=<span class="st">may</span>, <span class="st">pages</span>={9784–9790} }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <!-- ============================================================ -->
 <!-- FOOTER -->
